@@ -1,3 +1,5 @@
+// Chris Finck 2016
+
 class Game
 {
    private boolean m_isPaused = false;
