@@ -90,6 +90,7 @@ class BaseObject
   float hSpeed = 0.0;
   float vSpeed = 0.0;
   float hAccel = 0.0;
+  float vAccel = 0.0;
   float maxHSpeed = -1.0;
   float maxVSpeed = -1.0;
   private PImage tex;
@@ -179,93 +180,111 @@ class BaseObject
       if (tempObj != this && physics.CheckCollision(new Box(thinkPos[0], thinkPos[1], w, h), tempObj.GetBox()))
       {
         println("Collision!");
-        
-        // HORIZONTAL COLLISIONS
-        int hDirection;
-        if (abs(hSpeed) == hSpeed)
-          hDirection = 1;
-        else if (abs(hSpeed) != hSpeed)
-          hDirection = -1;
-        else
-          hDirection = 0;
-        hSpeed = 0;
         float[] tempPos = new float[2];
-        arrayCopy(thinkPos, tempPos);
-        if (tempPos[0] > x)
-        {
-          while (tempPos[0] > x)
-          {
-            println("Tiny Collision!");
-            if(physics.CheckCollision(new Box(tempPos[0], thinkPos[1], w, h), tempObj.GetBox()))
-              tempPos[0]--;
-            else
-              break;
-          }
-          if (tempPos[0] < x)
-            tempPos[0] = x;
-        }
+        
+        boolean hCollision = false;
+        boolean vCollision = false;
+        if (physics.CheckCollision(new Box(thinkPos[0], y, w, h), tempObj.GetBox()))
+          hCollision = true;
+        else if (physics.CheckCollision(new Box(x, thinkPos[1], w, h), tempObj.GetBox()))
+          vCollision = true;
         else
         {
-          while (tempPos[0] < x)
-          {
-            println("Tiny Collision!");
-            if(physics.CheckCollision(new Box(tempPos[0], thinkPos[1], w, h), tempObj.GetBox()))
-              tempPos[0]++;
-            else
-              break;
-          }
+          hCollision = true;
+          vCollision = true;
+        }
+        
+        if (hCollision)
+        {
+          // HORIZONTAL COLLISIONS
+          int hDirection;
+          if (abs(hSpeed) == hSpeed)
+            hDirection = 1;
+          else if (abs(hSpeed) != hSpeed)
+            hDirection = -1;
+          else
+            hDirection = 0;
+          hSpeed = 0;
+          arrayCopy(thinkPos, tempPos);
           if (tempPos[0] > x)
-            tempPos[0] = x;
-        }
-        arrayCopy(tempPos, thinkPos);
-        // Adjust stopping position of object
-        if (hDirection == 1)
-          thinkPos[0] = floor(thinkPos[0]);
-        else if (hDirection == -1)
-          thinkPos[0] = ceil(thinkPos[0]);
-          
-        // VERTICAL COLLISIONS  
-        int vDirection = 0;
-        if (abs(vSpeed) == vSpeed)
-          vDirection = 1;
-        else if (abs(vSpeed) != vSpeed)
-          vDirection = -1;
-        else
-          vDirection = 0;
-        vSpeed = 0;
-        arrayCopy(thinkPos, tempPos);
-        if (tempPos[1] > y)
-        {
-          while (tempPos[1] > y)
           {
-            println("Tiny Collision!");
-            if(physics.CheckCollision(new Box(thinkPos[0], tempPos[1], w, h), tempObj.GetBox()))
-              tempPos[1]--;
-            else
-              break;
+            while (tempPos[0] > x)
+            {
+              println("Tiny Collision!");
+              if(physics.CheckCollision(new Box(tempPos[0], thinkPos[1], w, h), tempObj.GetBox()))
+                tempPos[0]--;
+              else
+                break;
+            }
+            if (tempPos[0] < x)
+              tempPos[0] = x;
           }
-          if (tempPos[1] < y)
-            tempPos[1] = y;
-        }
-        else
-        {
-          while (tempPos[1] < y)
+          else
           {
-            println("Tiny Collision!");
-            if(physics.CheckCollision(new Box(thinkPos[0], tempPos[1], w, h), tempObj.GetBox()))
-              tempPos[1]++;
-            else
-              break;
+            while (tempPos[0] < x)
+            {
+              println("Tiny Collision!");
+              if(physics.CheckCollision(new Box(tempPos[0], thinkPos[1], w, h), tempObj.GetBox()))
+                tempPos[0]++;
+              else
+                break;
+            }
+            if (tempPos[0] > x)
+              tempPos[0] = x;
           }
+          arrayCopy(tempPos, thinkPos);
+          // Adjust stopping position of object
+          if (hDirection == 1)
+            thinkPos[0] = floor(thinkPos[0]);
+          else if (hDirection == -1)
+            thinkPos[0] = ceil(thinkPos[0]);
+        }
+        
+        if (vCollision)
+        {
+          // VERTICAL COLLISIONS  
+          int vDirection = 0;
+          if (abs(vSpeed) == vSpeed)
+            vDirection = 1;
+          else if (abs(vSpeed) != vSpeed)
+            vDirection = -1;
+          else
+            vDirection = 0;
+          vSpeed = 0;
+          arrayCopy(thinkPos, tempPos);
           if (tempPos[1] > y)
-            tempPos[1] = y;
+          {
+            while (tempPos[1] > y)
+            {
+              println("Tiny Collision!");
+              if(physics.CheckCollision(new Box(thinkPos[0], tempPos[1], w, h), tempObj.GetBox()))
+                tempPos[1]--;
+              else
+                break;
+            }
+            if (tempPos[1] < y)
+              tempPos[1] = y;
+          }
+          else
+          {
+            while (tempPos[1] < y)
+            {
+              println("Tiny Collision!");
+              if(physics.CheckCollision(new Box(thinkPos[0], tempPos[1], w, h), tempObj.GetBox()))
+                tempPos[1]++;
+              else
+                break;
+            }
+            if (tempPos[1] > y)
+              tempPos[1] = y;
+          }
+          arrayCopy(tempPos, thinkPos);
+          // Adjust stopping position of object
+          if (vDirection == 1)
+            thinkPos[1] = floor(thinkPos[1]);
+          else if (vDirection == -1)
+            thinkPos[1] = ceil(thinkPos[1]);
         }
-        arrayCopy(tempPos, thinkPos);
-        // Adjust stopping position of object
-        if (vDirection == 1)
-          thinkPos[1] = floor(thinkPos[1]);
-        else if (vDirection == -1)
-          thinkPos[1] = ceil(thinkPos[1]);
       }
     }
     SetPos(thinkPos[0], thinkPos[1]);
@@ -288,12 +307,12 @@ class Player extends BaseObject
   
   void MoveUp()
   {
-    vSpeed = vSpeed - hAccel;
+    vSpeed = vSpeed - vAccel;
   }
   
   void MoveDown()
   {
-    vSpeed = vSpeed + hAccel;
+    vSpeed = vSpeed + vAccel;
   }
   
   void Draw()
@@ -404,6 +423,7 @@ Player player;
 PImage img_ball;
 Wall wall;
 Wall wall2;
+Wall floor;
 
 void setup()
 {
@@ -433,27 +453,38 @@ void setup()
   KEYS[32].hFunc = "DebugResetPos";
   
 
-  OBJECTS = new BaseObject[3];
+  OBJECTS = new BaseObject[4];
   physics = new Physics();
+  
   player = new Player();
   OBJECTS[0] = player;
   player.hAccel = 2;
+  player.vAccel = 2;
   player.maxHSpeed = 10;
   player.hSpeed = 0;
   player.vSpeed = 0;
   player.maxVSpeed = 10;
+  
   wall = new Wall();
   OBJECTS[1] = wall;
   wall.x = 5 * width / 6;
   wall.y = (height / 2) - 32;
   wall.w = 64;
   wall.h = 64;
+  
   wall2 = new Wall();
   OBJECTS[2] = wall2;
   wall2.x = width / 6;
   wall2.y = (height / 2) - 32;
   wall2.w = 64;
   wall2.h = 64;
+  
+  floor = new Wall();
+  OBJECTS[3] = floor;
+  floor.x = 0;
+  floor.y = 2 * height / 3;
+  floor.w = width;
+  floor.h = 64;
   
   player.SetPos(width / 2, (height / 2) - 32);
 
@@ -510,4 +541,5 @@ void draw()
   wall.Draw();
   wall2.Draw();
   player.Draw();
+  floor.Draw();
 }
